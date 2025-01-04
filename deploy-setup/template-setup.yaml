@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  This template creates an S3 bucket for storing built lambda artefacts for devops deployments, which may be accessed
+  by other accounts within this AWS Organization
+
+Parameters:
+  OrgId:
+    Description: AWS Organization Id; belonging accounts will have read access to objects within this bucket
+    Type: String
+    AllowedPattern: ^o-[a-z0-9]{10,32}$
+
+Resources:
+  DeployBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub lambdacfnhooks-{AWS::AccountId}-deploybucket
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+
+
+  S3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref DeployBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS:
+                - '*'
+            Action:
+              - s3:GetObject
+            Resource: !GetAtt DeployBucket.Arn
+            Condition:
+              ForAnyValue:StringLike:
+                "aws:PrincipalOrgPaths": !Ref OrgId

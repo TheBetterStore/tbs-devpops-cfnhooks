@@ -1,0 +1,87 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  tbs-devops-cfnhooks
+
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: '/'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - 'lambda.amazonaws.com'
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+
+  LambdaHookExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: '/'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - 'hooks.cloudformation.amazonaws.com'
+            Action:
+              - sts:AssumeRole
+            Condition:
+              StringEquals:
+                "aws:SourceAccount": !Sub ${AWS::AccountId}
+              ArnLike:
+                "aws:SourceArn": !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:type/hook/*"
+      Policies:
+        - PolicyName: !Sub ${AWS::StackName}-LambdaHookExecutionRole
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: lambda:InvokeFunction
+                Resource:
+                  - !GetAtt LambdaCfnHookFunction.Arn
+
+  LambdaHook:
+    Type: AWS::CloudFormation::LambdaHook
+    Properties:
+      Alias: Tbs::Devops::LambdaCfnHooks
+      ExecutionRole: !GetAtt LambdaHookExecutionRole.Arn
+      FailureMode: FAIL
+      HookStatus: ENABLED
+      LambdaFunction: !GetAtt LambdaCfnHookFunction.Arn
+      TargetFilters:
+        TargetNames:
+          - AWS::Lambda::Function
+        Actions:
+          - CREATE
+          - UPDATE
+        InvocationPoints:
+          - PRE_PROVISION
+      TargetOperations:
+        - STACK
+        - RESOURCE
+        - CHANGE_SET
+        - CLOUD_CONTROL
+
+  LambdaCfnHookFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Architectures:
+        - x86_64
+      Code: lambdacfnhook/
+      Handler: app.handler
+      MemorySize: 256
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Runtime: nodejs20.x
+      ReservedConcurrentExecutions: 10
