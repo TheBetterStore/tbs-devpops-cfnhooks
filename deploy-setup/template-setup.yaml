@@ -13,10 +13,10 @@ Resources:
   DeployBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub lambdacfnhooks-{AWS::AccountId}-deploybucket
+      BucketName: !Sub lambdacfnhooks-${AWS::AccountId}-deploybucket
       BucketEncryption:
         ServerSideEncryptionConfiguration:
-          - ServerSideEncryptionDefault:
+          - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true

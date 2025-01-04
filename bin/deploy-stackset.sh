@@ -1,4 +1,6 @@
-cd deploy-setup
+#!/bin/bash
+
+cd ../deploy-setup
 
 stackName="tbs-devops-cfnhooks-deploysetup"
 region="ap-southeast-2"
