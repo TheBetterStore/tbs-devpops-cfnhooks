@@ -36,11 +36,13 @@ Resources:
         Statement:
           - Effect: Allow
             Principal:
-              AWS:
-                - '*'
+              AWS: '*'
             Action:
               - s3:GetObject
-            Resource: !GetAtt DeployBucket.Arn
+            Resource: !Join
+              - ''
+              - - !GetAtt DeployBucket.Arn
+                - /*
             Condition:
               ForAnyValue:StringLike:
-                "aws:PrincipalOrgPaths": !Ref OrgId
+                "aws:PrincipalOrgPaths": !Sub ${OrgId}/*
