@@ -1,11 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Transform: AWS::Serverless-2016-10-31
 Description: >
   tbs-devops-cfnhooks
-
-Globals:
-  Function:
-    Timeout: 3
 
 Resources:
   LambdaExecutionRole:
@@ -79,9 +74,10 @@ Resources:
     Properties:
       Architectures:
         - x86_64
-      Code: lambdacfnhook/
+      Code: cfnhooks/
       Handler: app.handler
       MemorySize: 256
       Role: !GetAtt LambdaExecutionRole.Arn
       Runtime: nodejs20.x
       ReservedConcurrentExecutions: 10
+      Timeout: 10

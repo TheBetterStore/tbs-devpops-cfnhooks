@@ -22,7 +22,8 @@ Resources:
     Properties:
       AutoDeployment:
         Enabled: true
-        RetainStackOnAccountRemoval: false
+        RetainStacksOnAccountRemoval: false
+      CallAs: DELEGATED_ADMIN # Required when deploying to delegated admin accounts for an org
       Capabilities: [CAPABILITY_IAM, CAPABILITY_NAMED_IAM]
       PermissionModel: SERVICE_MANAGED
       StackInstancesGroup:

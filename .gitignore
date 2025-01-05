@@ -206,5 +206,6 @@ $RECYCLE.BIN/
 *.lnk
 
 .idea
+generated-template.yaml
 
 # End of https://www.toptal.com/developers/gitignore/api/osx,node,linux,windows,sam
