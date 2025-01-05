@@ -5,6 +5,7 @@ region="ap-southeast-2"
 devopsAccountId="1234" # To replace
 targetOrgUnitIds="234,34534" # To replace
 deployBucket="lambdacfnhooks-${devopsAccountId}-deploybucket"
+currentTime=$(date +"%Y%m%d%H%M%S")
 
 cd ../tbs-devops-cfnhooks
 
@@ -20,10 +21,11 @@ aws s3 cp ./generated-template.yaml s3://$deployBucket/generated-template.yaml \
 
 
 # Next deploy the stackset, defined in IaC (Cfn) to our devops account, which will then manage deployment of the hooks to accounts
-# within specified target OU's
+# within specified target OU's. NB use lastupdatedtime tag to ensure deployment/that changes are detected
 cd ../deploy-setup
 aws cloudformation deploy --template template-stackset.yaml --stack-name $stackName \
 --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --region $region \
 --parameter-overrides TemplateUrl="https://$deployBucket.s3.ap-southeast-2.amazonaws.com/generated-template.yaml" \
 TargetOrgUnitIds=${targetOrgUnitIds} \
+--tags lastupdatedtime="$currentTime" \
 --profile thebetterstore-tools

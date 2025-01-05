@@ -1,0 +1,9 @@
+{
+  "name": "cfnhooks-loggroup",
+  "version": "1.0.0",
+  "description": "CfnHooks targeting loggroup resources",
+  "main": "app.js",
+  "repository": "https://github.com/TheBetterStore/tbs-devpops-cfnhooks",
+  "author": "Bryce Cumom,ck",
+  "license": "MIT"
+}

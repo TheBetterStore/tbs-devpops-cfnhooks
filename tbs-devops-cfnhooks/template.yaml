@@ -69,12 +69,47 @@ Resources:
         - CHANGE_SET
         - CLOUD_CONTROL
 
+  LogGroupHook:
+    Type: AWS::CloudFormation::LambdaHook
+    Properties:
+      Alias: Tbs::Devops::LogGroupCfnHooks
+      ExecutionRole: !GetAtt LambdaHookExecutionRole.Arn
+      FailureMode: FAIL
+      HookStatus: ENABLED
+      LambdaFunction: !GetAtt LogGroupCfnHookFunction.Arn
+      TargetFilters:
+        TargetNames:
+          - AWS::Logs::LogGroup
+        Actions:
+          - CREATE
+          - UPDATE
+        InvocationPoints:
+          - PRE_PROVISION
+      TargetOperations:
+        - STACK
+        - RESOURCE
+        - CHANGE_SET
+        - CLOUD_CONTROL
+
   LambdaCfnHookFunction:
     Type: AWS::Lambda::Function
     Properties:
       Architectures:
         - x86_64
-      Code: cfnhooks/
+      Code: cfnhooks-lambda/
+      Handler: app.handler
+      MemorySize: 256
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Runtime: nodejs20.x
+      ReservedConcurrentExecutions: 10
+      Timeout: 10
+
+  LogGroupCfnHookFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Architectures:
+        - x86_64
+      Code: cfnhooks-loggroup/
       Handler: app.handler
       MemorySize: 256
       Role: !GetAtt LambdaExecutionRole.Arn

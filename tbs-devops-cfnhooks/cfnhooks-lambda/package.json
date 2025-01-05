@@ -1,0 +1,9 @@
+{
+  "name": "cfnhooks-lambda",
+  "version": "1.0.0",
+  "description": "CfnHooks targeting lambda resources",
+  "main": "app.js",
+  "repository": "https://github.com/TheBetterStore/tbs-devpops-cfnhooks",
+  "author": "Bryce Cummock",
+  "license": "MIT"
+}
